@@ -45,6 +45,17 @@ Although modern Go provides `slog` (native structured logging), we prefer zerolo
 
 ---
 
+### Observability: New Relic
+
+We use **New Relic** for application observability.
+
+- Distributed tracing support
+- Application logs forwarding
+- Runtime performance monitoring
+- Better production debugging and visibility
+
+---
+
 ### Validation: go-playground/validator
 
 We use `go-playground/validator` for request validation instead of writing custom validation logic.
@@ -65,6 +76,18 @@ Why Koanf over Viper?
 - Modular design
 - Cleaner API
 - Viper is comparatively heavier
+
+---
+
+### Authentication: Clerk
+
+We use **Clerk** for authentication and user management.
+
+- Secure sign-in and session management
+- User and organization management out of the box
+- JWT-based auth flows that work well with APIs
+
+This allows us to avoid building and maintaining custom auth infrastructure.
 
 ---
 

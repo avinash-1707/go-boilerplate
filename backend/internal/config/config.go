@@ -60,28 +60,39 @@ type AuthConfig struct {
 }
 
 func LoadConfig() (*Config, error) {
+	// Create a basic startup logger for config bootstrap failures.
 	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
 
+	// Initialize koanf with dot-separated keys.
 	k := koanf.New(".")
 
+	// Load environment variables with BOILERPLATE_ prefix into koanf.
 	err := k.Load(env.Provider("BOILERPLATE_", ".", func(s string) string {
+		// Convert BOILERPLATE_FOO_BAR -> foo_bar.
 		return strings.ToLower(strings.TrimPrefix(s, "BOILERPLATE_"))
 	}), nil)
 	if err != nil {
+		// Fatal because app cannot run without config.
 		logger.Fatal().Err(err).Msg("could not load initial env variables")
 	}
 
+	// Prepare target struct for decoded config values.
 	mainConfig := &Config{}
 
+	// Map loaded values into the strongly typed Config struct.
 	err = k.Unmarshal("", mainConfig)
 	if err != nil {
+		// Fatal when config decoding fails.
 		logger.Fatal().Err(err).Msg("could not unmarshal main config")
 	}
 
+	// Create validator for required/typed config fields.
 	validate := validator.New()
 
+	// Validate all config tags before app startup.
 	err = validate.Struct(mainConfig)
 	if err != nil {
+		// Fatal on invalid or missing required configuration.
 		logger.Fatal().Err(err).Msg("config validation failed")
 	}
 
@@ -96,8 +107,10 @@ func LoadConfig() (*Config, error) {
 
 	// Validate observability config
 	if err := mainConfig.Observability.Validate(); err != nil {
+		// Fatal if observability options are inconsistent.
 		logger.Fatal().Err(err).Msg("invalid observability config")
 	}
 
+	// Return validated configuration for the application.
 	return mainConfig, nil
 }
